@@ -42,6 +42,7 @@ app.controller('DiceController', function($scope, $timeout, finiteListBias) {
 		percentage: 0
 	};
 
+
 	$scope.increasing = false;
 	$scope.roller = rollers.finiteListBias;
 
@@ -65,7 +66,7 @@ app.controller('DiceController', function($scope, $timeout, finiteListBias) {
 			}
 		}
 		progress();
-	}
+	};
 
 	$scope.decrease = function() {
 		$scope.increasing = false;
@@ -82,7 +83,7 @@ app.controller('DiceController', function($scope, $timeout, finiteListBias) {
 			}
 		}
 		progress();
-	}
+	};
 
 
 });
