@@ -1,0 +1,4 @@
+dice
+====
+
+Biased dice roller.
