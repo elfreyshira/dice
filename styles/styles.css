@@ -1,0 +1,22 @@
+body {
+	font-family: 'Alegreya Sans', sans-serif;
+	text-align: center;
+}
+
+.title {
+	font-size: 80px
+}
+
+.container {
+	width: 100%;
+	text-align: center;
+	/*margin: 0 auto;*/
+}
+.round-button {
+	cursor: pointer;
+	display: inline-block;
+	/*overflow: hidden;*/
+	/*width: 100%;*/
+	/*text-align: center;*/
+	/*margin: 0 auto;*/
+}
