@@ -38,7 +38,7 @@ app.controller('DiceController', function($scope, $timeout, finiteListBias) {
 	}
 
 	$scope.roundProgressData = {
-		label: "Click",
+		label: "Hold",
 		percentage: 0
 	};
 

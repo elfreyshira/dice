@@ -17,6 +17,6 @@ body {
 	display: inline-block;
 	/*overflow: hidden;*/
 	/*width: 100%;*/
-	/*text-align: center;*/
-	/*margin: 0 auto;*/
+	text-align: center;
+	margin: 0 auto;
 }
