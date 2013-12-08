@@ -31,11 +31,52 @@ app.service('finiteListBias', function() {
 
 });
 
-app.controller('DiceController', function($scope, $timeout, finiteListBias) {
-
-	var rollers = {
-		finiteListBias: finiteListBias
+app.service('equalSpreadBias', function() {
+	var startArr = [];
+	for (i = 1; i <= 6; i++ ) {
+		for (j = 1; j <= 6; j++) {
+			startArr.push(i + j);
+		}
 	}
+	var total = startArr.length;
+	var currentArr = startArr.slice();
+	var possibleValues = _.unique(startArr);
+	var originalMappedValues = _.countBy(startArr);
+	var currentMappedValues = _.countBy(currentArr);
+
+	function shiftValues(numberRolled) {
+		var valueToShare = currentMappedValues[numberRolled];
+		currentMappedValues[numberRolled] = 0;
+		possibleValues.forEach(function(val) {
+			currentMappedValues[val] += originalMappedValues[val] / 36.0 * valueToShare;
+		});
+	}
+
+	function roll() {
+		var rawRoll = Math.random() * total;
+		var currentSum = 0;
+
+		var rolled;
+		for (i = 0; i < possibleValues.length; i++) {
+			var value = possibleValues[i];
+			if (currentSum + currentMappedValues[value] > rawRoll) {
+				shiftValues(value);
+				return value;
+			}
+			currentSum += currentMappedValues[value];
+		}
+	}
+
+	return {
+		roll: roll
+	}
+
+});
+
+app.controller('DiceController', function($scope, $timeout, finiteListBias, equalSpreadBias) {
+
+	// var roller = finiteListBias;
+	var roller = equalSpreadBias;
 
 	$scope.roundProgressData = {
 		label: "Hold",
@@ -44,7 +85,6 @@ app.controller('DiceController', function($scope, $timeout, finiteListBias) {
 
 
 	$scope.increasing = false;
-	$scope.roller = rollers.finiteListBias;
 
 	$scope.increase = function() {
 		$scope.increasing = true;
@@ -57,7 +97,7 @@ app.controller('DiceController', function($scope, $timeout, finiteListBias) {
 				);
 
 				if ($scope.roundProgressData.percentage >= 1.0) {
-					$scope.roundProgressData.label = finiteListBias.roll();
+					$scope.roundProgressData.label = roller.roll();
 				}
 
 				$timeout(function(){
@@ -87,4 +127,11 @@ app.controller('DiceController', function($scope, $timeout, finiteListBias) {
 
 
 });
+
+
+
+
+
+
+// https://www.google.com/search?q=radial+progress+bar&oq=radial+progress+bar&aqs=chrome..69i57j0l5.3261j0j7&sourceid=chrome&espv=210&es_sm=91&ie=UTF-8
 
