@@ -2,8 +2,8 @@ var app = angular.module('dice', ['angular.directives-round-progress']);
 
 app.service('finiteListBias', function() {
 	var startArr = [];
-	for (i = 1; i <= 6; i++ ) {
-		for (j = 1; j <= 6; j++) {
+	for (var i = 1; i <= 6; i++ ) {
+		for (var j = 1; j <= 6; j++) {
 			startArr.push(i + j);
 		}
 	}
@@ -31,41 +31,95 @@ app.service('finiteListBias', function() {
 
 });
 
-app.service('equalSpreadBias', function() {
-	var startArr = [];
-	for (i = 1; i <= 6; i++ ) {
-		for (j = 1; j <= 6; j++) {
-			startArr.push(i + j);
+app.service('equalSpreadBias', function($window) {
+	var startArr,
+	total,
+	currentArr,
+	possibleValues,
+	originalMappedValues,
+	currentMappedValues,
+	rollHistory;
+
+	function reset() {
+		startArr = [];
+		for (var i = 1; i <= 6; i++ ) {
+			for (var j = 1; j <= 6; j++) {
+				startArr.push(i + j);
+			}
 		}
+		total = startArr.length;
+		currentArr = startArr.slice();
+		possibleValues = _.unique(startArr);
+		originalMappedValues = _.countBy(startArr);
+		currentMappedValues = _.countBy(currentArr);
+		rollHistory = _.reduce(
+			possibleValues,
+			function(result, num) {
+				result[num] = 0;
+				return result;
+			},
+			{}
+			);
 	}
-	var total = startArr.length;
-	var currentArr = startArr.slice();
-	var possibleValues = _.unique(startArr);
-	var originalMappedValues = _.countBy(startArr);
-	var currentMappedValues = _.countBy(currentArr);
+
+	reset();
 
 	function shiftValues(numberRolled) {
-		var valueToShare = currentMappedValues[numberRolled];
-		currentMappedValues[numberRolled] = 0;
+		currentMappedValues[numberRolled] -= 1;
 		possibleValues.forEach(function(val) {
-			currentMappedValues[val] += originalMappedValues[val] / 36.0 * valueToShare;
+			if (val !== numberRolled) {
+				var addedValue = originalMappedValues[val] / 36.0;
+				var extraValueFromRolledProportion = addedValue
+				* originalMappedValues[numberRolled] / (36.0 - originalMappedValues[numberRolled]);
+				currentMappedValues[val] += (addedValue + extraValueFromRolledProportion);
+			}
 		});
 	}
 
-	function roll() {
+	function rollSlave() {
 		var rawRoll = Math.random() * total;
 		var currentSum = 0;
 
 		var rolled;
-		for (i = 0; i < possibleValues.length; i++) {
+		for (var i = 0; i < possibleValues.length; i++) {
 			var value = possibleValues[i];
 			if (currentSum + currentMappedValues[value] > rawRoll) {
-				shiftValues(value);
 				return value;
 			}
 			currentSum += currentMappedValues[value];
 		}
 	}
+
+	function rollHelper() {
+		var numberRolled = rollSlave();
+		if (currentMappedValues[numberRolled] >= originalMappedValues[numberRolled]) {
+			shiftValues(numberRolled);
+			return numberRolled;
+		}
+		else {
+			return rollHelper();
+		}
+	}
+
+	function roll() {
+		var numberRolled = rollHelper();
+		rollHistory[numberRolled] += 1;
+		return numberRolled;
+	}
+
+	(function() {
+		// comment out when debugging
+		// return;
+		$window.showState = function() {
+			console.log(currentMappedValues);
+			console.log(rollHistory);
+		};
+		$window.reset = reset;
+		$window.roll = function() {
+			console.log(roll());
+			$window.showState();
+		};
+	})();
 
 	return {
 		roll: roll
@@ -82,7 +136,6 @@ app.controller('DiceController', function($scope, $timeout, finiteListBias, equa
 		label: "Hold",
 		percentage: 0
 	};
-
 
 	$scope.increasing = false;
 
@@ -133,5 +186,6 @@ app.controller('DiceController', function($scope, $timeout, finiteListBias, equa
 
 
 
-// https://www.google.com/search?q=radial+progress+bar&oq=radial+progress+bar&aqs=chrome..69i57j0l5.3261j0j7&sourceid=chrome&espv=210&es_sm=91&ie=UTF-8
+// https://www.google.com/search?q=radial+progress+bar&oq=radial+progress+bar&aqs=chrome..69i57j0l5.3261j0j7&
+// sourceid=chrome&espv=210&es_sm=91&ie=UTF-8
 
