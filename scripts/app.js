@@ -1,4 +1,8 @@
-var app = angular.module('dice', ['angular.directives-round-progress']);
+var app = angular.module('dice',
+	[
+		'angular.directives-round-progress',
+		'ngTouch'
+	]);
 
 app.factory('pickNumberFromDistribution', function() {
 
@@ -263,10 +267,8 @@ app.service('equalSpreadBias', function($window) {
 
 });
 
-app.controller('DiceController', function($scope, $timeout, equalChanceDistributionBias) {
+app.controller('DiceController', function($scope, $timeout, $interval, equalChanceDistributionBias) {
 
-	// var roller = finiteListBias;
-	// var roller = equalSpreadBias;
 	var roller = equalChanceDistributionBias;
 
 	$scope.roundProgressData = {
@@ -276,53 +278,36 @@ app.controller('DiceController', function($scope, $timeout, equalChanceDistribut
 
 	$scope.increasing = false;
 
+	var disableTouch = false;
 	$scope.increase = function() {
-		$scope.increasing = true;
-		function progress() {
-			if ($scope.roundProgressData.percentage < 1.0 && $scope.increasing) {
 
-				$scope.roundProgressData.percentage = Math.min(
-					$scope.roundProgressData.percentage + .04,
-					1.0
-				);
+		if (!disableTouch && $scope.roundProgressData.percentage < 1.0) {
+			$scope.roundProgressData.percentage = Math.min(
+				$scope.roundProgressData.percentage + 0.6,
+				1.0
+			);
 
-				if ($scope.roundProgressData.percentage >= 1.0) {
-					$scope.roundProgressData.label = roller.roll();
-				}
-
-				$timeout(function(){
-					progress();
-				}, 10);
-			}
-		}
-		progress();
-	};
-
-	$scope.decrease = function() {
-		$scope.increasing = false;
-		function progress() {
-			if ($scope.roundProgressData.percentage > 0 && !$scope.increasing) {
-
+			var decreaseInterval = $interval(function() {
 				$scope.roundProgressData.percentage = Math.max(
-					$scope.roundProgressData.percentage - .06,
+					$scope.roundProgressData.percentage - .005,
 					0.0
 				);
-				$timeout(function(){
-					progress();
-				}, 10);
+				if ($scope.roundProgressData.percentage <= 0) {
+					$interval.cancel(decreaseInterval);
+				}
+			}, 10)
+
+			// Roll after it's full
+			if ($scope.roundProgressData.percentage >= 1.0) {
+				disableTouch = true;
+				$scope.roundProgressData.label = roller.roll();
+
+				$timeout(function() {
+					disableTouch = false;
+				}, 1000);
 			}
 		}
-		progress();
+
 	};
 
-
 });
-
-
-
-
-
-
-// https://www.google.com/search?q=radial+progress+bar&oq=radial+progress+bar&aqs=chrome..69i57j0l5.3261j0j7&
-// sourceid=chrome&espv=210&es_sm=91&ie=UTF-8
-
