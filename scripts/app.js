@@ -99,7 +99,7 @@ app.service('equalChanceDistributionBias', function($window, pickNumberFromDistr
 
 		shiftValues(numberRolled, valueToRedistribute);
 
-		rollHistory[numberRolled] += 1;
+		// rollHistory[numberRolled] += 1;
 
 		return numberRolled;
 	}
