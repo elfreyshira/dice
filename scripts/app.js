@@ -292,7 +292,7 @@ app.controller('DiceController', function($scope, $timeout, $interval, equalChan
     var roller = equalChanceDistributionBias;
 
     $scope.roundProgressData = {
-        label: "Hold",
+        label: "Tap",
         percentage: 0
     };
 
