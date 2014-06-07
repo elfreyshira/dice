@@ -277,7 +277,9 @@ app.factory('getRollAudio', function() {
         'sf-hadouken',
         'sonic-coin'
     ], function(mp3Title) {
-        return new Audio('resources/' + mp3Title + '.mp3');
+        var audioObj = new Audio('resources/' + mp3Title + '.mp3');
+        audioObj.preload = 'auto';
+        return audioObj;
     });
 
     return function() {
