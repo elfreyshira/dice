@@ -1,11 +1,15 @@
+
 body {
+	margin: 0;
+	padding: 0;
 	font-family: 'Alegreya Sans', sans-serif;
-	background-color: #222;
+	/*background-color: #222;*/
 	text-align: center;
 }
 
 .title {
-	font-size: 80px;
+	margin-top: 40px;
+	font-size: 60px;
 	color: #eee;
 }
 
@@ -28,4 +32,20 @@ body {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+}
+
+#background {
+	padding: 0;
+	margin: 0;
+	background-image: url(../images/bg1.png);
+	background-color: transparent;
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	overflow: hidden;
+	position: fixed;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	z-index: -1;
 }
