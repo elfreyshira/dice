@@ -283,17 +283,18 @@ app.controller('DiceController', function($scope, $timeout, $interval, equalChan
 
 		if (!disableTouch && $scope.roundProgressData.percentage < 1.0) {
 			$scope.roundProgressData.percentage = Math.min(
-				$scope.roundProgressData.percentage + 0.6,
+				$scope.roundProgressData.percentage + 0.75,
 				1.0
 			);
 
 			var decreaseInterval = $interval(function() {
 				$scope.roundProgressData.percentage = Math.max(
-					$scope.roundProgressData.percentage - .005,
+					$scope.roundProgressData.percentage - .01,
 					0.0
 				);
 				if ($scope.roundProgressData.percentage <= 0) {
 					$interval.cancel(decreaseInterval);
+					disableTouch = false;
 				}
 			}, 10)
 
@@ -301,10 +302,6 @@ app.controller('DiceController', function($scope, $timeout, $interval, equalChan
 			if ($scope.roundProgressData.percentage >= 1.0) {
 				disableTouch = true;
 				$scope.roundProgressData.label = roller.roll();
-
-				$timeout(function() {
-					disableTouch = false;
-				}, 1000);
 			}
 		}
 
