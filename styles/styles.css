@@ -37,7 +37,7 @@ body {
 #background {
 	padding: 0;
 	margin: 0;
-	background-image: url(../images/bg1.png);
+	background-image: url(../resources/bg1.png);
 	background-color: transparent;
 	background-position: center center;
 	background-repeat: no-repeat;

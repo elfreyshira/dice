@@ -268,7 +268,26 @@ app.service('equalSpreadBias', function($window) {
 
 });
 
-app.controller('DiceController', function($scope, $timeout, $interval, equalChanceDistributionBias) {
+app.factory('getRollAudio', function() {
+
+    var sounds = _.map([
+        'ff-move',
+        'mario-jump',
+        'metal-gear-alarm',
+        'sf-hadouken',
+        'sonic-coin'
+    ], function(mp3Title) {
+        return new Audio('resources/' + mp3Title + '.mp3');
+    });
+
+    return function() {
+        return _.sample(sounds);
+    };
+
+
+});
+
+app.controller('DiceController', function($scope, $timeout, $interval, equalChanceDistributionBias, getRollAudio) {
 
     var roller = equalChanceDistributionBias;
 
@@ -301,6 +320,7 @@ app.controller('DiceController', function($scope, $timeout, $interval, equalChan
 
             // Roll after it's full
             if ($scope.roundProgressData.percentage >= 1.0) {
+                getRollAudio().play();
                 disableTouch = true;
                 $scope.roundProgressData.label = roller.roll();
             }
