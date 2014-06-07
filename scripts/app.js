@@ -283,7 +283,7 @@ app.controller('DiceController', function($scope, $timeout, $interval, equalChan
 
 		if (!disableTouch && $scope.roundProgressData.percentage < 1.0) {
 			$scope.roundProgressData.percentage = Math.min(
-				$scope.roundProgressData.percentage + 0.75,
+				$scope.roundProgressData.percentage + 0.6,
 				1.0
 			);
 
@@ -296,7 +296,7 @@ app.controller('DiceController', function($scope, $timeout, $interval, equalChan
 					$interval.cancel(decreaseInterval);
 					disableTouch = false;
 				}
-			}, 10)
+			}, 15)
 
 			// Roll after it's full
 			if ($scope.roundProgressData.percentage >= 1.0) {
