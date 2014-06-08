@@ -157,35 +157,47 @@ app.factory('getRollAudio', function() {
 app.controller('DiceController', function($scope, $timeout, $interval, equalChanceDistributionBias, getRollAudio) {
 
     var roller = equalChanceDistributionBias;
+    var INITIAL_LABEL = "Tap";
+    var HELPER_LABEL = "Again";
 
     $scope.roundProgressData = {
-        label: "Tap",
+        label: INITIAL_LABEL,
         percentage: 0
     };
-
-    $scope.increasing = false;
 
     var disableTouch = false;
     $scope.increase = function() {
 
+        if($scope.roundProgressData.label === INITIAL_LABEL) {
+            $scope.roundProgressData.label = HELPER_LABEL;
+        }
+
         if (!disableTouch && $scope.roundProgressData.percentage < 1.0) {
+
             $scope.roundProgressData.percentage = Math.min(
                 $scope.roundProgressData.percentage + 0.6,
                 1.0
             );
 
             var decreaseInterval = $interval(function() {
+
                 $scope.roundProgressData.percentage = Math.max(
                     $scope.roundProgressData.percentage - .01,
                     0.0
                 );
+
                 if ($scope.roundProgressData.percentage <= 0) {
                     $interval.cancel(decreaseInterval);
                     disableTouch = false;
+
+                    if ($scope.roundProgressData.label === HELPER_LABEL) {
+                        $scope.roundProgressData.label = INITIAL_LABEL;
+                    }
+
                 }
             }, 15)
 
-            // Roll after it's full
+            // Roll dice after it's full
             if ($scope.roundProgressData.percentage >= 1.0) {
                 getRollAudio().play();
                 disableTouch = true;
