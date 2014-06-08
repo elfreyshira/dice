@@ -31,6 +31,10 @@ body {
 	user-select: none;
 }
 
+.by-elfrey {
+	margin-top: 40px;
+}
+
 #background {
 	padding: 0;
 	margin: 0;
