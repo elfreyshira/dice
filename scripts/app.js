@@ -98,7 +98,7 @@ app.service('equalChanceDistributionBias', function($window, pickNumberFromDistr
 
         shiftValues(numberRolled, valueToRedistribute);
 
-        // rollHistory[numberRolled] += 1;
+        rollHistory[numberRolled] += 1;
 
         return numberRolled;
     }
@@ -128,8 +128,14 @@ app.service('equalChanceDistributionBias', function($window, pickNumberFromDistr
     ////////////////////////////
     ////////////////////////////
 
+    var rollHistory = _.reduce(possibleValues, function(result, num) {
+        result[num] = 0;
+        return result;
+    }, {});
+
     return {
-        roll: roll
+        roll: roll,
+        rollHistory: rollHistory
     };
 
 });
@@ -157,13 +163,15 @@ app.factory('getRollAudio', function() {
 app.controller('DiceController', function($scope, $timeout, $interval, equalChanceDistributionBias, getRollAudio) {
 
     var roller = equalChanceDistributionBias;
-    var INITIAL_LABEL = "Tap";
-    var HELPER_LABEL = "Again";
+    var INITIAL_LABEL = 'Tap';
+    var HELPER_LABEL = 'Again';
 
     $scope.roundProgressData = {
         label: INITIAL_LABEL,
         percentage: 0
     };
+
+    $scope.rollHistory = roller.rollHistory;
 
     var disableTouch = false;
     $scope.increase = function() {
@@ -207,4 +215,55 @@ app.controller('DiceController', function($scope, $timeout, $interval, equalChan
 
     };
 
+});
+
+
+app.directive('bars', function ($parse) {
+    return {
+        restrict: 'E',
+        replace: true,
+        scope: {
+            data: '=',
+        },
+        template: '<div id="chart"></div>',
+        link: function (scope, element, attrs) {
+            
+            var pairedData = _.pairs(scope.data);
+
+            d3.select('#chart')
+                .append('div').attr('class', 'chart')
+                .selectAll('div')
+                .data(pairedData).enter()
+                .append('div').attr('class', function(d) {
+                    return 'bar';
+                })
+                .transition().ease('elastic')
+                .style('width', function(d) {
+                    return d[1] + '%';
+                })
+                .text(function(d) {
+                    return d[0];
+                });
+
+            scope.$watch('data', function(newDataObj, oldDataObj) {
+                if (_.isEqual(newDataObj, oldDataObj)) {
+                    return;
+                }
+
+                var newPairedData = _.pairs(newDataObj);
+                var maxTimesNumberRolled = _.max(newPairedData, function(pair) {
+                    return pair[1];
+                })[1];
+
+                d3.select('#chart')
+                    .selectAll('div.bar')
+                    .style('width', function(dataPair) {
+                        var number = dataPair[0];
+                        return (newDataObj[number] / maxTimesNumberRolled * 100) + '%';
+                    });
+
+            // the `true` means deep watch the object
+            }, true);
+        }
+    };
 });
