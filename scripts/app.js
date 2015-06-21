@@ -92,15 +92,43 @@ app.service('equalChanceDistributionBias', function($window, pickNumberFromDistr
 
     }
 
+    var previousNumber;
+    var onRepeat = false;
+
+    function meetRepeatCriteria(numberRolled) {
+        if (onRepeat) {
+            return true;
+        }
+        else if (previousNumber === numberRolled) {
+            if (Math.random() <= originalProbabilities[numberRolled]) {
+                onRepeat = false;
+                return true
+            }
+            else {
+                onRepeat = true;
+                return false;
+            }
+        }
+        else {
+            previousNumber = numberRolled;
+            onRepeat = false;
+            return true;
+        }
+    }
+
     function roll() {
         var valueToRedistribute = averageValueChosen(currentMappedValues);
         var numberRolled = pickNumberFromDistribution(currentMappedValues);
 
-        shiftValues(numberRolled, valueToRedistribute);
+        if (meetRepeatCriteria(numberRolled)) {
+            shiftValues(numberRolled, valueToRedistribute);
+            rollHistory[numberRolled] += 1;
+            return numberRolled;
+        }
+        else {
+            return roll();
+        }
 
-        rollHistory[numberRolled] += 1;
-
-        return numberRolled;
     }
 
     //////////////////////////////
