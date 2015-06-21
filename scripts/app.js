@@ -100,7 +100,7 @@ app.service('equalChanceDistributionBias', function($window, pickNumberFromDistr
             return true;
         }
         else if (previousNumber === numberRolled) {
-            if (Math.random() <= originalProbabilities[numberRolled])*3 {
+            if (Math.random() <= originalProbabilities[numberRolled]*3) {
                 onRepeat = false;
                 return true
             }
